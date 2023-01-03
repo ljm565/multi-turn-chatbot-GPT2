@@ -32,7 +32,6 @@ def main(config_path:Config, args:ArgumentParser):
         # make neccessary folders
         os.makedirs(base_path+'model', exist_ok=True)
         os.makedirs(base_path+'loss', exist_ok=True)
-        os.makedirs(base_path+'images', exist_ok=True)
         os.makedirs(base_path+'data/dailydialog/processed', exist_ok=True)
     
         # save processed data
