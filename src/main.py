@@ -87,10 +87,11 @@ def main(config_path:Config, args:ArgumentParser):
                     queries.append(query)
                     if query == 'new()':
                         queries, turn, state = [], 0, 'A'
-                        print()
+                        print('Please enter new 3 multi-turn dialogues..\n')
                         continue
                     elif query == 'exit()':
                         break
+                state = 'A' if state == 'Q' else 'Q'
                 turn += 1
             
             # for multi-turn chatting
@@ -101,7 +102,7 @@ def main(config_path:Config, args:ArgumentParser):
                 queries.append(query)
                 if query == 'new()':
                     queries, turn, state = [], 0, 'A'
-                    print()
+                    print('Please enter new 3 multi-turn dialogues..\n')
                     continue
                 elif query == 'exit()':
                     break
