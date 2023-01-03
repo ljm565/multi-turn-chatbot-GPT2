@@ -39,6 +39,7 @@ class Trainer:
         self.epochs = self.config.epochs
         self.lr = self.config.lr
         self.max_len = self.config.max_len
+        self.result_num = self.config.result_num
 
         # define tokenizer
         self.tokenizer = Tokenizer(self.config)
@@ -158,12 +159,12 @@ class Trainer:
             for x in tqdm(self.dataloaders[phase], desc=phase + ' inferencing..'):
                 x = x.to(self.device)
                 output = self.model(x)
-
-                x = x[:, 1:].deatch().cpu()
-                output = output[:, :-1].deatch().cpu()
+                
+                x = x[:, 1:].detach().cpu()
+                output = torch.argmax(output[:, :-1].detach().cpu(), dim=-1)
                 all_trg.append(x)
-                all_output.append(torch.argmax(output, dim=-1))
-            
+                all_output.append(output)
+
         # calculate scores
         all_ref, all_pred = tensor2list(all_trg, all_output, self.tokenizer)
         bleu2 = cal_scores(all_ref, all_pred, 'bleu', 2)
@@ -175,7 +176,7 @@ class Trainer:
 
         # print samples
         ids = random.sample(list(range(len(all_pred))), result_num)
-        print_samples(all_ref, all_pred, ids)
+        print_samples(all_ref, all_pred, ids, self.tokenizer)
 
         return bleu2, bleu4, nist2, nist4
 
