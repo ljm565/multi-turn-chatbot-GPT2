@@ -1,0 +1,7 @@
+.vscode/
+__pycache__/
+model/
+loss/
+.DS_Store
+data/processed/
+logs/
