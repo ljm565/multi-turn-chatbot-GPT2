@@ -75,3 +75,10 @@ def print_samples(ref, pred, ids, tokenizer):
         print('gt  : {}'.format(r))
         print('pred: {}\n'.format(p))
     print('-'*50 + '\n')
+
+
+def preprocessing_query(queries, tokenizer):
+    total_s = [tokenizer.cls_token_id]
+    for s in queries:
+        total_s += tokenizer.encode(s) + [tokenizer.sep_token_id]
+    return total_s

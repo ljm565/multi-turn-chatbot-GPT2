@@ -7,7 +7,7 @@ from utils.config import Config
 import json
 import sys
 
-from utils.utils_func import check_data, make_dataset_path
+from utils.utils_func import check_data, make_dataset_path, preprocessing_query
 
 
 
@@ -33,7 +33,7 @@ def main(config_path:Config, args:ArgumentParser):
         os.makedirs(base_path+'model', exist_ok=True)
         os.makedirs(base_path+'loss', exist_ok=True)
         os.makedirs(base_path+'images', exist_ok=True)
-        os.makedirs(base_path+'data/processed', exist_ok=True)
+        os.makedirs(base_path+'data/dailydialog/processed', exist_ok=True)
     
         # save processed data
         check_data(base_path)
@@ -65,17 +65,59 @@ def main(config_path:Config, args:ArgumentParser):
             pickle.dump(loss_data, f)
             
     elif args.mode == 'chatting':
-        print('Chatbot starts...\n')
+        msg = """
+        Chatbot starts..
+        If you want to chat new topic, enter the "new()"..
+        If you want to exit, enter the "exit()"..
+        
+        Please enter the 3 multi-turn dialogues..
+        """
+        print(msg + '\n')
+
+        
+        tokenizer = trainer.tokenizer
+        queries, turn, state = [], 0, 'A'
         while 1:
-            query = input('Q: ')
-            if query == 'exit':
-                break
-            answer = trainer.chatting(query)
-            print('A: ' + answer + '\n')
-        print('Chatbot ends...\n')
+            # for initializing topic of dialogues
+            if len(queries) < 3:
+                while len(queries) < 3:
+                    state = 'A' if state == 'Q' else 'Q'
+                    turn += 1
+                    query = input(state + str(turn) + ': ')
+                    queries.append(query)
+                    if query == 'new()':
+                        queries, turn, state = [], 0, 'A'
+                        print()
+                        continue
+                    elif query == 'exit()':
+                        break
+                turn += 1
+            
+            # for multi-turn chatting
+            else:
+                state = 'A' if state == 'Q' else 'Q'
+                turn += 1
+                query = input(state + str(turn) + ': ')
+                queries.append(query)
+                if query == 'new()':
+                    queries, turn, state = [], 0, 'A'
+                    print()
+                    continue
+                elif query == 'exit()':
+                    break
+
+            # query preprocessing
+            query = preprocessing_query(queries, tokenizer)
+            
+            # answer of the model
+            query = trainer.chatting(query)
+            queries.append(query)
+            print(state + str(turn) + ': ' + query )
+
+        print('Chatbot ends..\n')
 
     else:
-        print("Please select mode among 'train' and 'chatting'..")
+        print("Please select mode between 'train' and 'chatting'..")
         sys.exit()
 
 
