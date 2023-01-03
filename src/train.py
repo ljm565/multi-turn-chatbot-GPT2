@@ -152,25 +152,17 @@ class Trainer:
 
     def inference(self, phase, result_num=3):
         self.model.eval()
-        all_trg, all_output = [], []
 
+        all_trg, all_output = [], []
         with torch.no_grad():
             for x in tqdm(self.dataloaders[phase], desc=phase + ' inferencing..'):
                 x = x.to(self.device)
-                all_trg.append(trg.detach().cpu())
-            
-                decoder_all_output = []
-                for j in range(self.max_len):
-                    if j == 0:
-                        trg = trg[:, j].unsqueeze(1)
-                        _, output = self.model(src, trg)
-                        trg = torch.cat((trg, torch.argmax(output[:, -1], dim=-1).unsqueeze(1)), dim=1)
-                    else:
-                        _, output = self.model(src, trg)
-                        trg = torch.cat((trg, torch.argmax(output[:, -1], dim=-1).unsqueeze(1)), dim=1)
-                    decoder_all_output.append(output[:, -1].unsqueeze(1).detach().cpu())
-                        
-                all_output.append(torch.argmax(torch.cat(decoder_all_output, dim=1), dim=-1))
+                output = self.model(x)
+
+                x = x[:, 1:].deatch().cpu()
+                output = output[:, :-1].deatch().cpu()
+                all_trg.append(x)
+                all_output.append(torch.argmax(output, dim=-1))
             
         # calculate scores
         all_ref, all_pred = tensor2list(all_trg, all_output, self.tokenizer)
