@@ -160,8 +160,8 @@ class Trainer:
                 x = x.to(self.device)
                 output = self.model(x)
                 
-                x = x[:, 1:].detach().cpu()
-                output = torch.argmax(output[:, :-1].detach().cpu(), dim=-1)
+                x = x.detach().cpu()
+                output = torch.argmax(output.detach().cpu(), dim=-1)
                 all_trg.append(x)
                 all_output.append(output)
 
