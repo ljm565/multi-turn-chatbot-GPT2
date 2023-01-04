@@ -3,7 +3,6 @@ import torch.nn as nn
 from transformers import GPT2LMHeadModel
 
 
-# BERT
 class GPTChatbot(nn.Module):
     def __init__(self, config, tokenizer):
         super(GPTChatbot, self).__init__()
