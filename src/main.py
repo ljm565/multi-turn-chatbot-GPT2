@@ -62,6 +62,10 @@ def main(config_path:Config, args:ArgumentParser):
         print('Saving the loss related data...')
         with open(loss_data_path, 'wb') as f:
             pickle.dump(loss_data, f)
+
+    elif args.mode == 'inference':
+        print('Start inferencing...\n')
+        trainer.inference('test', config.result_num)
             
     elif args.mode == 'chatting':
         msg = """
@@ -117,7 +121,7 @@ def main(config_path:Config, args:ArgumentParser):
         print('Chatbot ends..\n')
 
     else:
-        print("Please select mode between 'train' and 'chatting'..")
+        print("Please select mode among 'train', 'inference', and 'chatting'..")
         sys.exit()
 
 
@@ -128,7 +132,7 @@ if __name__ == '__main__':
 
     parser = ArgumentParser()
     parser.add_argument('-d', '--device', type=str, required=True, choices=['cpu', 'gpu'])
-    parser.add_argument('-m', '--mode', type=str, required=True, choices=['train', 'chatting'])
+    parser.add_argument('-m', '--mode', type=str, required=True, choices=['train', 'inference', 'chatting'])
     parser.add_argument('-c', '--cont', type=int, default=0, required=False)
     parser.add_argument('-n', '--name', type=str, required=False)
     args = parser.parse_args()
