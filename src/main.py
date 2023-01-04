@@ -77,32 +77,31 @@ def main(config_path:Config, args:ArgumentParser):
         """
         print(msg + '\n')
 
-        
         tokenizer = trainer.tokenizer
         queries, turn, state = [], 0, 'A'
         while 1:
+            turn += 1
+
             # for initializing topic of dialogues
             if len(queries) < 3:
                 while len(queries) < 3:
                     state = 'A' if state == 'Q' else 'Q'
-                    turn += 1
                     query = input(state + str(turn) + ': ')
                     queries.append(query)
+                    turn += 1
                     if query == 'new()':
                         queries, turn, state = [], 0, 'A'
                         print('Please enter new 3 multi-turn dialogues..\n')
                         continue
                     elif query == 'exit()':
                         break
-                state = 'A' if state == 'Q' else 'Q'
-                turn += 1
             
             # for multi-turn chatting
             else:
                 state = 'A' if state == 'Q' else 'Q'
-                turn += 1
                 query = input(state + str(turn) + ': ')
                 queries.append(query)
+                turn += 1
                 if query == 'new()':
                     queries, turn, state = [], 0, 'A'
                     print('Please enter new 3 multi-turn dialogues..\n')
@@ -114,6 +113,7 @@ def main(config_path:Config, args:ArgumentParser):
             query = preprocessing_query(queries, tokenizer)
             
             # answer of the model
+            state = 'A' if state == 'Q' else 'Q'
             query = trainer.chatting(query)
             queries.append(query)
             print(state + str(turn) + ': ' + query )

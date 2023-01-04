@@ -77,7 +77,33 @@ GPT-2를 이용한 multi-turn 챗봇 모델 학습에 대한 설명은 [GPT-2와
         * BLEU-4: 0.3479
         * NIST-2: 6.3979
         * NIST-4: 7.1139
+        <br><br>
 
+* ### Multi-turn GPT-2 챗봇 모델 결과
+    ```
+    Chatbot starts..
+    If you want to chat new topic, enter the "new()"..
+    If you want to exit, enter the "exit()"..
+    
+    Please enter the 3 multi-turn dialogues..
+
+    Q1: I saw her yesterday.
+    A2: What did she doing?
+    Q3: She tried to fix her car.
+    A4: I don't think she will do it again.
+    Q5: Why do you think so?
+    A6: I don't know.It must be a long story.
+    Q7: I will ask about story to her tomorrow.
+    A8: 
+    Q9: new()
+    Please enter new 3 multi-turn dialogues..
+
+    Q1: Do you know about Kane?
+    A2: Yes of course. He is my one of the best freind.
+    Q3: Does he like soccer?
+    A4: Yes.He is a very good player.He is a member of the Brazilians.
+    Q5: Oh I didn't know about that.
+    ```
 
 
 <br><br><br>
