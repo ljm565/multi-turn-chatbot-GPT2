@@ -58,7 +58,7 @@ class Trainer:
 
         # model, optimizer, loss
         self.model = GPTChatbot(self.config, self.tokenizer).to(self.device)
-        self.criterion = nn.CrossEntropyLoss()
+        self.criterion = nn.CrossEntropyLoss(ignore_index=self.tokenizer.pad_token_id)
     
         if self.mode == 'train':
             total_steps = len(self.dataloaders['train']) * self.epochs
