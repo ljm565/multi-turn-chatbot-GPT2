@@ -71,12 +71,11 @@ GPT-2를 이용한 multi-turn 챗봇 모델 학습에 대한 설명은 [GPT-2와
     <img src="images/nist.png" width="80%"><br><br>
     
     * 최종 Test Set Scores<br>
-        Validation set accuracy가 가장 높았던 100 epoch 모델을 test set에 적용한 결과입니다.
-        100 epoch을 돌면서 validation set의 결과는 꾸준히 개선되고 있었지만 시간 관계상 100 epoch만을 돌렸습니다.<br>
-        * BLEU-2: 0.4736
-        * BLEU-4: 0.3479
-        * NIST-2: 6.3979
-        * NIST-4: 7.1139
+        Validation set accuracy가 가장 높았던 모델을 test set에 적용한 결과입니다.<br>
+        * BLEU-2: 0.4052
+        * BLEU-4: 0.2268
+        * NIST-2: 5.1797
+        * NIST-4: 5.5162
         <br><br>
 
 * ### Multi-turn GPT-2 챗봇 모델 결과
@@ -90,19 +89,32 @@ GPT-2를 이용한 multi-turn 챗봇 모델 학습에 대한 설명은 [GPT-2와
     Q1: I saw her yesterday.
     A2: What did she doing?
     Q3: She tried to fix her car.
-    A4: I don't think she will do it again.
+    A4: I'm sure she's going to do it again.
     Q5: Why do you think so?
-    A6: I don't know.It must be a long story.
-    Q7: I will ask about story to her tomorrow.
-    A8: 
-    Q9: new()
+    A6: I think she's trying to get donations.
+    Q7: You mean, the car?
+    A8: Yes, it's the one she used to drive.It's broken now.
+    Q9: Oh I didn't know about that.
+    A10: I'm sorry, she's driving again.She'll pay for it.It's her birthday today.Donations for sure.Thanks a lot.
+    Q11: okay.
+    A12: I'll call her.
+    Q13: please stop
+    A14: 
+    Q15: new()
     Please enter new 3 multi-turn dialogues..
 
-    Q1: Do you know about Kane?
-    A2: Yes of course. He is my one of the best freind.
-    Q3: Does he like soccer?
-    A4: Yes.He is a very good player.He is a member of the Brazilians.
-    Q5: Oh I didn't know about that.
+    Q1: Do you know Kane?
+    A2: Yes of course. He is one of my best friends.
+    Q3: Does he like playing soccer?                        
+    A4: Yes.But he is not good at it.
+    Q5: But he was a soccer player, wasn't he?
+    A6: Yes.But he is a very good player.
+    Q7: Why?
+    A8: Kane is a very good player.He is a very creative player.He can dribble, he can dribble, he can make free throws.
+    Q9: Okay.
+    A10: But he is not good at shooting.
+    Q11: exit()
+    Chatbot ends..
     ```
 
 
