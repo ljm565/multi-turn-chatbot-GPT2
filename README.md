@@ -67,7 +67,7 @@ GPT-2를 이용한 multi-turn 챗봇 모델 학습에 대한 설명은 [GPT-2와
     * BLEU Score History<br>
     <img src="images/bleu.jpg" width="80%"><br><br>
 
-    * NIST History<br>
+    * NIST Score History<br>
     <img src="images/nist.jpg" width="80%"><br><br>
     
     * 최종 Test Set Scores<br>
