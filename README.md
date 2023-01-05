@@ -65,10 +65,10 @@ GPT-2를 이용한 multi-turn 챗봇 모델 학습에 대한 설명은 [GPT-2와
 ## 결과
 * ### Multi-turn GPT-2 챗봇 모델 결과
     * BLEU Score History<br>
-    <img src="images/bleu.png" width="80%"><br><br>
+    <img src="images/bleu.jpg" width="80%"><br><br>
 
     * NIST History<br>
-    <img src="images/nist.png" width="80%"><br><br>
+    <img src="images/nist.jpg" width="80%"><br><br>
     
     * 최종 Test Set Scores<br>
         Validation set accuracy가 가장 높았던 모델을 test set에 적용한 결과입니다.<br>
