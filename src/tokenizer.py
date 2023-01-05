@@ -26,7 +26,7 @@ class Tokenizer:
 
     def decode(self, tok):
         try:
-            tok = tok[:(len(tok) - list(reversed(tok)).index(self.pad_token_id))]
+            tok = tok[:(len(tok) - list(reversed(tok)).index(self.sep_token_id))]
         except ValueError:
             try:
                 tok = tok[:tok.index(self.pad_token_id)]
