@@ -10,6 +10,7 @@ project: outputs/gpt2
 name: daily_dialog_chatbot
 
 # model config
+pretrained_model: gpt2
 max_len: 128
 
 # data config

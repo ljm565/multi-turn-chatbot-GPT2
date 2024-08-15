@@ -5,58 +5,37 @@ import torch
 from torch import distributed as dist
 from torch.utils.data import DataLoader, distributed
 
-from models import Transformer
-from tools.tokenizers import Tokenizer
+from models import GPT2
+from tools.tokenizers import CustomGPT2Tokenizer
 from utils import LOGGER, RANK, colorstr
 from utils.filesys_utils import read_dataset
-from utils.data_utils import DLoader, seed_worker, preprocess_data
+from utils.data_utils import DLoader, seed_worker
 
 PIN_MEMORY = str(os.getenv('PIN_MEMORY', True)).lower() == 'true'  # global pin_memory for dataloaders
 
 
 
-def get_tokenizers(config, is_ddp=False):
-    if config.counselor_dataset_train:
-        preprocess_data(config)
-        vocab_size = str(config.vocab_size)
-        data_path = os.path.join(config.counselor_dataset.path, 'counselor')
-        
-        if not os.path.isdir(os.path.join(data_path, f'tokenizer/vocab_{vocab_size}')):
-            main_dir = '/'.join(os.path.realpath(__file__).split('/')[:-3])
-            vocab_sh = os.path.join(main_dir, 'src/tools/tokenizers/build/make_vocab.sh')
-            vocab_py = os.path.join(main_dir, 'src/tools/tokenizers/build/vocab_trainer.py')
-            
-            raw_data_path = os.path.join(main_dir, config.counselor_dataset.path, 'counselor/raw')
-            tokenizer_path = os.path.join(main_dir, config.counselor_dataset.path, 'counselor/tokenizer')
-            
-            LOGGER.info((colorstr("Making vocab file for custom tokenizer..")))
-            runs = subprocess.run([vocab_sh, raw_data_path, tokenizer_path, vocab_size, vocab_py], capture_output=True, text=True)
-            LOGGER.info((colorstr(runs.stdout)))
-            LOGGER.error(colorstr('red', runs.stderr))
-
-        config.tokenizer_path = os.path.join(data_path, f'tokenizer/vocab_{vocab_size}/vocab.txt')
-        tokenizer = Tokenizer(config)
-
-        if is_ddp:
-            dist.barrier()      # wait all gpus to finish vocab file creation
-            
+def get_tokenizers(config):
+    if config.dailydialog_train:
+        tokenizer = CustomGPT2Tokenizer(config)
+        config.vocab_size = tokenizer.vocab_size
     else:
         LOGGER.warning(colorstr('yellow', 'You must implement your custom tokenizer loading codes..'))
         raise NotImplementedError
-    
     return tokenizer
 
 
 def get_model(config, tokenizer, device):
-    model = Transformer(config, tokenizer, device).to(device)
+    model = GPT2(config, tokenizer).to(device)
     return model
 
 
 def build_dataset(config, tokenizer, modes):
-    if config.counselor_dataset_train:
-        dataset_paths = preprocess_data(config)
-        tmp_dsets = {s: DLoader(read_dataset(p), tokenizer, config) for s, p in dataset_paths.items()}
-        dataset_dict = {mode: tmp_dsets[mode] for mode in modes}
+    if config.dailydialog_train:
+        dataset_dir = os.path.join(config.dailydialog_dataset.path, 'dailydialog/processed')
+        dataset_paths = {mode: os.path.join(dataset_dir, f'dailydialog.{mode}') if mode != 'validation' \
+                                                else os.path.join(dataset_dir, 'dailydialog.val') for mode in modes}
+        dataset_dict = {s: DLoader(read_dataset(p), tokenizer, config) for s, p in dataset_paths.items() if s in dataset_paths}
     else:
         LOGGER.warning(colorstr('yellow', 'You have to implement data pre-processing code..'))
         # dataset_dict = {mode: CustomDLoader(config.CUSTOM.get(f'{mode}_data_path')) for mode in modes}

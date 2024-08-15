@@ -12,7 +12,7 @@ from tools.tokenizers import *
 from tools import TrainingLogger, Evaluator, EarlyStopper
 from trainer.build import get_model, get_data_loader, get_tokenizers
 from utils import RANK, LOGGER, SCHEDULER_MSG, SCHEDULER_TYPE, colorstr, init_seeds
-from utils.func_utils import *
+from utils.utils_func import *
 from utils.filesys_utils import *
 from utils.training_utils import *
 
@@ -54,7 +54,7 @@ class Trainer:
 
         # init tokenizer, model, dataset, dataloader, etc.
         self.modes = ['train', 'validation'] if self.is_training_mode else ['train', 'validation', 'test']
-        self.tokenizer = get_tokenizers(self.config, self.is_ddp)
+        self.tokenizer = get_tokenizers(self.config)
         self.dataloaders = get_data_loader(self.config, self.tokenizer, self.modes, self.is_ddp)
         self.model = self._init_model(self.config, self.tokenizer, self.mode)
         self.training_logger = TrainingLogger(self.config, self.is_training_mode)
@@ -188,19 +188,19 @@ class Trainer:
             logging_header = ['CE Loss', 'lr']
             pbar = init_progress_bar(train_loader, self.is_rank_zero, logging_header, nb)
 
-        for i, (src, trg) in pbar:
+        for i, x in pbar:
             # Warmup
             self.train_cur_step += 1
             if self.train_cur_step <= self.warmup_steps_n:
                 self.optimizer.param_groups[0]['lr'] = lr_warmup(self.train_cur_step, self.warmup_steps_n, self.lr0, self.lf)
             cur_lr = self.optimizer.param_groups[0]['lr']
             
-            batch_size = src.size(0)
-            src, trg = src.to(self.device), trg.to(self.device)
+            batch_size = x.size(0)
+            x = x.to(self.device)
             
             self.optimizer.zero_grad()
-            _, output = self.model(src, trg)
-            loss = self.criterion(output[:, :-1, :].reshape(-1, output.size(-1)), trg[:, 1:].reshape(-1))
+            output = self.model(x)
+            loss = self.criterion(output[:, :-1, :].reshape(-1, output.size(-1)), x[:, 1:].reshape(-1))
             loss.backward()
             self.optimizer.step()
             self.scheduler.step()
@@ -251,9 +251,9 @@ class Trainer:
 
                 self.model.eval()
 
-                for i, (src, trg) in pbar:
-                    batch_size = src.size(0)
-                    src, trg = src.to(self.device), trg.to(self.device)
+                for i, x in pbar:
+                    batch_size = x.size(0)
+                    x = x.to(self.device)
 
                     sources = [self.tokenizer.decode(s.tolist()) for s in src]
                     targets4metrics = [self.tokenizer.decode(t[1:].tolist()) for t in trg]
