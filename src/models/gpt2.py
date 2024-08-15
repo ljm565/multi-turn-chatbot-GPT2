@@ -3,9 +3,9 @@ import torch.nn as nn
 from transformers import GPT2LMHeadModel
 
 
-class GPTChatbot(nn.Module):
+class GPT2(nn.Module):
     def __init__(self, config, tokenizer):
-        super(GPTChatbot, self).__init__()
+        super(GPT2, self).__init__()
         self.pretrained_model = config.pretrained_model
         self.model = GPT2LMHeadModel.from_pretrained(self.pretrained_model)
         self.model.resize_token_embeddings(config.vocab_size)

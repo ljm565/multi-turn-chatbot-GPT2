@@ -1,0 +1,37 @@
+# base
+seed: 0
+deterministic: True
+
+# environment config
+device: cpu     # examples: [0], [0,1], [1,2,3], cpu, mps... 
+
+# project config
+project: outputs/gpt2
+name: daily_dialog_chatbot
+
+# model config
+max_len: 128
+
+# data config
+workers: 0                      # Don't worry to set worker. The number of workers will be set automatically according to the batch size.
+dailydialog_train: True         # If True, dailydialog data will be loaded automatically.
+dailydialog_dataset:
+    path: data/
+CUSTOM:
+    train_data_path: null
+    validation_data_path: null
+    test_data_path: null
+
+# train config
+batch_size: 60
+steps: 10000
+warmup_steps: 200
+lr0: 1e-4
+lrf: 0.1                              # last_lr = lr0 * lrf
+scheduler_type: 'cosine'              # ['linear', 'cosine']
+patience: 5                           # Early stopping epochs.
+prediction_print_n: 10                # Number of examples to show during inference.
+
+# logging config
+common: ['train_loss', 'validation_loss', 'lr']
+metrics: ['ppl', 'bleu2', 'bleu4', 'nist2', 'nist4']   # You can add more metrics after implements metric validation codes

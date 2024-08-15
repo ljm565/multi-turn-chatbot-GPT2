@@ -2,7 +2,7 @@ from transformers import GPT2Tokenizer
 
 
 
-class Tokenizer:
+class CustomGPT2Tokenizer:
     def __init__(self, config):
         self.pretrained_model = config.pretrained_model
         self.tokenizer = GPT2Tokenizer.from_pretrained(self.pretrained_model)
