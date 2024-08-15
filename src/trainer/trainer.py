@@ -188,7 +188,7 @@ class Trainer:
             logging_header = ['CE Loss', 'lr']
             pbar = init_progress_bar(train_loader, self.is_rank_zero, logging_header, nb)
 
-        for i, x in pbar:
+        for i, (x, y) in pbar:
             # Warmup
             self.train_cur_step += 1
             if self.train_cur_step <= self.warmup_steps_n:
@@ -196,11 +196,17 @@ class Trainer:
             cur_lr = self.optimizer.param_groups[0]['lr']
             
             batch_size = x.size(0)
-            x = x.to(self.device)
+            x, y = x.to(self.device), y.to(self.device)
             
             self.optimizer.zero_grad()
             output = self.model(x)
-            loss = self.criterion(output[:, :-1, :].reshape(-1, output.size(-1)), x[:, 1:].reshape(-1))
+            
+            # masked label training
+            if self.train_cur_step / self.steps >= self.config.train_user_turn_mask_step:
+                loss = self.criterion(output[:, :-1, :].reshape(-1, output.size(-1)), y[:, 1:].reshape(-1))
+            else:
+                loss = self.criterion(output[:, :-1, :].reshape(-1, output.size(-1)), x[:, 1:].reshape(-1))
+            
             loss.backward()
             self.optimizer.step()
             self.scheduler.step()
@@ -251,9 +257,9 @@ class Trainer:
 
                 self.model.eval()
 
-                for i, x in pbar:
+                for i, (x, y) in pbar:
                     batch_size = x.size(0)
-                    x = x.to(self.device)
+                    x, y = x.to(self.device), y.to(self.device)
 
                     sources = [self.tokenizer.decode(s.tolist()) for s in src]
                     targets4metrics = [self.tokenizer.decode(t[1:].tolist()) for t in trg]

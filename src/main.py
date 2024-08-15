@@ -7,7 +7,7 @@ from utils.config import Config
 import json
 import sys
 
-from utils.utils_func import check_data, make_dataset_path, preprocessing_query
+from utils.func_utils import check_data, make_dataset_path, preprocessing_query
 
 
 

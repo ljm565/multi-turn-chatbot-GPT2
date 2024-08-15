@@ -11,6 +11,7 @@ class CustomGPT2Tokenizer:
         self.pad_token, self.pad_token_id = self.tokenizer.pad_token, self.tokenizer.pad_token_id
         self.cls_token, self.cls_token_id = self.tokenizer.cls_token, self.tokenizer.cls_token_id
         self.sep_token, self.sep_token_id = self.tokenizer.sep_token, self.tokenizer.sep_token_id
+        self.eos_token, self.eos_token_id = self.tokenizer.eos_token, self.tokenizer.eos_token_id
         self.unk_token, self.unk_token_id = self.tokenizer.unk_token, self.tokenizer.unk_token_id
 
         self.vocab_size = len(self.tokenizer)
@@ -21,15 +22,8 @@ class CustomGPT2Tokenizer:
 
 
     def encode(self, s):
-        return self.tokenizer.encode(s)
+        return self.tokenizer.encode(s, add_special_tokens=False)
 
 
     def decode(self, tok):
-        try:
-            tok = tok[:(len(tok) - list(reversed(tok)).index(self.sep_token_id))]
-        except ValueError:
-            try:
-                tok = tok[:tok.index(self.pad_token_id)]
-            except:
-                pass
         return self.tokenizer.decode(tok)

@@ -32,6 +32,7 @@ lrf: 0.1                              # last_lr = lr0 * lrf
 scheduler_type: 'cosine'              # ['linear', 'cosine']
 patience: 5                           # Early stopping epochs.
 prediction_print_n: 10                # Number of examples to show during inference.
+train_user_turn_mask_step: 0.5        # [0.0 ~ 1.0], The point where the labels that masked even turns (user turns, e.g., 0, 2, 4, ...) are being trained.
 
 # logging config
 common: ['train_loss', 'validation_loss', 'lr']

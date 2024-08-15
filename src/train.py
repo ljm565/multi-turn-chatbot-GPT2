@@ -10,7 +10,7 @@ import time
 from tqdm import tqdm
 
 from utils.config import Config
-from utils.utils_func import *
+from utils.func_utils import *
 from utils.utils_data import DLoader
 from models.model import GPTChatbot
 
