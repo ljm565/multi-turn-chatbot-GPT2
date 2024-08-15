@@ -12,7 +12,7 @@ from tools.tokenizers import *
 from tools import TrainingLogger, Evaluator, EarlyStopper
 from trainer.build import get_model, get_data_loader, get_tokenizers
 from utils import RANK, LOGGER, SCHEDULER_MSG, SCHEDULER_TYPE, colorstr, init_seeds
-from utils.utils_func import *
+from utils.func_utils import *
 from utils.filesys_utils import *
 from utils.training_utils import *
 
