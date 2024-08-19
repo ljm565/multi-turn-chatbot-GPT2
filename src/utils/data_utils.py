@@ -1,5 +1,6 @@
 import random
 import numpy as np
+from copy import deepcopy
 
 import torch
 from torch.utils.data import Dataset
@@ -32,6 +33,10 @@ class DLoader(Dataset):
             sentence_token = self.tokenizer.encode(sentence) + [self.tokenizer.sep_token_id]
             all_turns_tokens.extend(sentence_token)
 
+            if i == 0:
+                first_sentence = self.padding(deepcopy(all_turns_tokens)[:self.max_len], self.max_len, self.tokenizer.pad_token_id)
+                first_sentence_l = len(all_turns_tokens)
+
             # label tokens
             if i % 2  == 1:
                 label_tokens.extend(sentence_token)
@@ -58,7 +63,7 @@ class DLoader(Dataset):
         assert len(all_turns_tokens) == len(label_tokens) == self.max_len, \
             colorstr(f'The token length must be equal to the max length of the config.yaml. Expected {self.max_len}, but got {len(all_turns_tokens)}')
 
-        return all_turns_tokens, label_tokens
+        return all_turns_tokens, label_tokens, first_sentence, first_sentence_l
     
 
     @staticmethod
@@ -68,8 +73,9 @@ class DLoader(Dataset):
 
 
     def __getitem__(self, idx):
-        x, y = self.make_data(self.data[idx])
-        return torch.tensor(x, dtype=torch.long), torch.tensor(y, dtype=torch.long)
+        x, y, fs, fsl = self.make_data(self.data[idx])
+        return torch.tensor(x, dtype=torch.long), torch.tensor(y, dtype=torch.long), \
+                torch.tensor(fs, dtype=torch.long), torch.tensor(fsl, dtype=torch.long)
 
 
     def __len__(self):

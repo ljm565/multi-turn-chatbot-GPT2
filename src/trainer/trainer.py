@@ -188,7 +188,7 @@ class Trainer:
             logging_header = ['CE Loss', 'lr']
             pbar = init_progress_bar(train_loader, self.is_rank_zero, logging_header, nb)
 
-        for i, (x, y) in pbar:
+        for i, (x, y, _, _) in pbar:
             # Warmup
             self.train_cur_step += 1
             if self.train_cur_step <= self.warmup_steps_n:
@@ -257,20 +257,19 @@ class Trainer:
 
                 self.model.eval()
 
-                for i, (x, y) in pbar:
+                for i, (x, y, fs, fsl) in pbar:
                     batch_size = x.size(0)
-                    x, y = x.to(self.device), y.to(self.device)
+                    x, y, fs = x.to(self.device), y.to(self.device), fs.to(self.device)
 
-                    sources = [self.tokenizer.decode(s.tolist()) for s in src]
-                    targets4metrics = [self.tokenizer.decode(t[1:].tolist()) for t in trg]
+                    targets4metrics = [self.tokenizer.decode(t.tolist()) for t in x]
 
                     predictions, loss = self.model.batch_inference(
-                        src=src,
-                        start_tokens=trg[:, 0], 
+                        src=x,
+                        start_tokens=(fs, fsl),
                         max_len=self.max_len,
                         tokenizer=self.tokenizer,
                         loss_func=self.criterion,
-                        target=trg
+                        target=y
                     )
                 
                     metric_results = self.metric_evaluation(loss, predictions, targets4metrics)
@@ -291,7 +290,7 @@ class Trainer:
 
                     ids = random.sample(range(batch_size), min(self.config.prediction_print_n, batch_size))
                     for id in ids:
-                        print_samples(' '.join(sources[id].split()[1:]), targets4metrics[id], predictions[id])
+                        print_samples(targets4metrics[id], predictions[id])
 
                     if not is_training_now:
                         _append_data_for_vis(
