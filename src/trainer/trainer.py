@@ -328,25 +328,43 @@ class Trainer:
         return metric_results
     
     
-    def chatting(self, query):
-        query = [self.tokenizer.bos_token_id] + self.tokenizer.encode(query)[:self.max_len-2] + [self.tokenizer.eos_token_id]
-        query = query + [self.tokenizer.pad_token_id] * (self.max_len - len(query))
-        
-        query = torch.LongTensor(query).unsqueeze(0).to(self.device)
-        trg = torch.LongTensor([self.tokenizer.bos_token_id]).unsqueeze(0).to(self.device)
-
-        decoder_all_output = []
-        for i in range(self.max_len):
-            if i == 0:
-                trg = trg[:, i].unsqueeze(1)
-                _, output = self.model(query, trg)
-                trg = torch.cat((trg, torch.argmax(output[:, -1], dim=-1).unsqueeze(1)), dim=1)
+    def chatting(self, query: str, is_first_query=False):
+        def _preprocess(query, is_first_query, query_cache=None):
+            if is_first_query:
+                query = [self.tokenizer.cls_token_id] + self.tokenizer.encode(query) + [self.tokenizer.sep_token_id]
+                query_cache = torch.tensor(query, dtype=torch.long).unsqueeze(0).to(self.device)
             else:
-                _, output = self.model(query, trg)
-                trg = torch.cat((trg, torch.argmax(output[:, -1], dim=-1).unsqueeze(1)), dim=1)
+                query = self.tokenizer.encode(query) + [self.tokenizer.sep_token_id]
+                query_cache = torch.cat([query_cache, torch.tensor(query, dtype=torch.long).unsqueeze(0).to(self.device)], dim=1)
+            return query_cache
+            
+        self.query_cache = None if is_first_query else self.query_cache
+        self.query_cache = _preprocess(query, is_first_query, self.query_cache)
+        query_done = False
+        is_first_query = False
 
-            decoder_all_output.append(output[:, -1].unsqueeze(1).detach().cpu())
-        decoder_all_output = torch.argmax(torch.cat(decoder_all_output, dim=1), dim=-1)
-        decoder_all_output = self.tokenizer.decode(decoder_all_output[0].tolist())
+        answer = []
+        while 1:
+            output = self.model(self.query_cache)
+            pred_token = torch.argmax(output[:, -1], dim=-1)
+            answer.append(pred_token.item())
+            self.query_cache = torch.cat((self.query_cache, pred_token.unsqueeze(1)), dim=1)
+
+            if pred_token == self.tokenizer.sep_token_id:
+                answer.pop()
+                break
+            elif pred_token == self.tokenizer.eos_token_id:
+                answer.pop()
+                query_done = True
+                break
+            
+            if self.query_cache.size(1) >= self.max_len:
+                query_done = True
+                break
+            
+            if query_done:
+                self.query_cache = None
+                is_first_query = True
         
-        return decoder_all_output
+        answer = self.tokenizer.decode(answer)
+        return self.query_cache, answer, query_done, is_first_query

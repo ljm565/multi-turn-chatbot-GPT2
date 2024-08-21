@@ -49,12 +49,15 @@ def chatting(args, config):
     )
     
     LOGGER.info(colorstr('Chatbot starts...\n'))
+    query_done = False
+    is_first_query = True
     while 1:
         query = input('Q: ')
         if query == 'exit':
             break
-        answer = trainer.chatting(query)
-        LOGGER.info('A: ' + answer + '\n')
+        query, answer, query_done, is_first_query = trainer.chatting(query, is_first_query)
+        LOGGER.info('A: ' + answer)
+
     LOGGER.info(colorstr('Chatbot ends...\n'))
 
 
