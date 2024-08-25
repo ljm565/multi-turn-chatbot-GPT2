@@ -1,0 +1,6 @@
+transformers==4.28.1
+sconf==0.2.5
+numpy==1.21.1
+tqdm==4.62.2
+matplotlib==3.4.2
+nltk==3.7
