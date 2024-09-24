@@ -35,7 +35,7 @@ def build_dataset(config, tokenizer, modes):
         dataset_dir = os.path.join(config.dailydialog_dataset.path, 'dailydialog/processed')
         dataset_paths = {mode: os.path.join(dataset_dir, f'dailydialog.{mode}') if mode != 'validation' \
                                                 else os.path.join(dataset_dir, 'dailydialog.val') for mode in modes}
-        dataset_dict = {s: DLoader(read_dataset(p), tokenizer, config) for s, p in dataset_paths.items() if s in dataset_paths}
+        dataset_dict = {s: DLoader(read_dataset(p), tokenizer, config) for s, p in dataset_paths.items()}
     else:
         LOGGER.warning(colorstr('yellow', 'You have to implement data pre-processing code..'))
         # dataset_dict = {mode: CustomDLoader(config.CUSTOM.get(f'{mode}_data_path')) for mode in modes}
