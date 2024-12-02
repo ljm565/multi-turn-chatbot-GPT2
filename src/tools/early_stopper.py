@@ -12,6 +12,7 @@ class EarlyStopper:
 
     def __call__(self, epoch, high=None, low=None):
         if self.is_init:
+            self.is_init = False
             self.best_high, self.bestlow = high, low
             return False
         
